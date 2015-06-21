@@ -158,4 +158,11 @@ mod tests {
         assert_eq!(c64(4.0, 12.0) - c64(3.0, -15.0), c64(1.0, 27.0));
         assert_eq!(c64(0.0, 5.0) - c64(-9.0, 1.0), c64(9.0, 4.0));
     }
+
+    #[test]
+    fn size_of() {
+        use std::mem::size_of;
+        assert_eq!(size_of::<c64>(), 2 * size_of::<f64>());
+        assert_eq!(size_of::<[c64; 42]>(), size_of::<[f64; 2 * 42]>());
+    }
 }
