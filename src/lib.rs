@@ -5,7 +5,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 /// A complex number.
-trait Complex {
+pub trait Complex {
     type Real: Add<Output=Self::Real> +
                Div<Output=Self::Real> +
                Mul<Output=Self::Real> +
