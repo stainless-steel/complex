@@ -2,15 +2,21 @@
 //!
 //! [1]: https://en.wikipedia.org/wiki/Complex_number
 
+use std::fmt::Debug;
 use std::ops::{Add, Div, Mul, Sub};
 
 /// A complex number.
-pub trait Complex {
+pub trait Complex: Add<Output=Self> +
+                   Div<Output=Self> +
+                   Mul<Output=Self> +
+                   Sub<Output=Self> +
+                   Copy + Debug + PartialEq {
+
     type Real: Add<Output=Self::Real> +
                Div<Output=Self::Real> +
                Mul<Output=Self::Real> +
                Sub<Output=Self::Real> +
-               Copy;
+               Copy + Debug + PartialEq;
 
     fn new(Self::Real, Self::Real) -> Self;
     fn re(&self) -> Self::Real;
@@ -130,7 +136,7 @@ implement!(c64, f64);
 
 #[cfg(test)]
 mod tests {
-    use c64;
+    use {Complex, c64};
 
     #[test]
     fn add() {
@@ -164,5 +170,23 @@ mod tests {
         use std::mem::size_of;
         assert_eq!(size_of::<c64>(), 2 * size_of::<f64>());
         assert_eq!(size_of::<[c64; 42]>(), size_of::<[f64; 2 * 42]>());
+    }
+
+    #[test]
+    fn scalar_arguments() {
+        assert_eq!(go(c64(0.0, 0.0), c64(0.0, 0.0), c64(1.0, 1.0)), c64(0.0, 0.0));
+
+        fn go<C>(a: C, b: C, c: C) -> C where C: Complex {
+            (a + b) * (a - b) / c
+        }
+    }
+
+    #[test]
+    fn vector_arguments() {
+        assert_eq!(go(&[c64(0.0, 0.0)], &[c64(0.0, 0.0)], &[c64(1.0, 1.0)]), &[c64(0.0, 0.0)]);
+
+        fn go<C>(a: &[C], b: &[C], c: &[C]) -> Vec<C> where C: Complex {
+            a.iter().zip(b).zip(c).map(|((&a, &b), &c)| (a + b) * (a - b) / c).collect()
+        }
     }
 }
