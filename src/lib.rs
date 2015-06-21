@@ -23,12 +23,12 @@ pub trait Complex: Add<Output=Self> +
     fn im(&self) -> Self::Real;
 }
 
-/// A complex number whose parts are 32 bit.
+/// A complex number with 32-bit parts.
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct c32(pub f32, pub f32);
 
-/// A complex number whose parts are 64 bit.
+/// A complex number with 64-bit parts.
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct c64(pub f64, pub f64);
