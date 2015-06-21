@@ -20,12 +20,12 @@ pub trait Complex {
 /// A complex number whose parts are 32 bit.
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct c32(f32, f32);
+pub struct c32(pub f32, pub f32);
 
 /// A complex number whose parts are 64 bit.
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct c64(f64, f64);
+pub struct c64(pub f64, pub f64);
 
 macro_rules! implement(
     ($complex:ident, $real:ty) => (
