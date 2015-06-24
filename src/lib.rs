@@ -18,9 +18,20 @@ pub trait Complex: Add<Output=Self> +
                Sub<Output=Self::Real> +
                Copy + Debug + PartialEq;
 
+    /// Create a complex number from a real and an imaginary part.
     fn new(Self::Real, Self::Real) -> Self;
+
+    /// Return the real part.
     fn re(&self) -> Self::Real;
+
+    /// Return the real part as a mutable reference.
+    fn re_mut(&mut self) -> &mut Self::Real;
+
+    /// Return the imaginary part.
     fn im(&self) -> Self::Real;
+
+    /// Return the imaginary part as a mutable reference.
+    fn im_mut(&mut self) -> &mut Self::Real;
 }
 
 /// A complex number with 32-bit parts.
@@ -49,8 +60,18 @@ macro_rules! implement(
             }
 
             #[inline(always)]
+            fn re_mut(&mut self) -> &mut Self::Real {
+                &mut self.0
+            }
+
+            #[inline(always)]
             fn im(&self) -> Self::Real {
                 self.1
+            }
+
+            #[inline(always)]
+            fn im_mut(&mut self) -> &mut Self::Real {
+                &mut self.1
             }
         }
 
@@ -137,6 +158,14 @@ implement!(c64, f64);
 #[cfg(test)]
 mod tests {
     use {Complex, c64};
+
+    #[test]
+    fn re_im_mut() {
+        let mut number = c64(0.0, 0.0);
+        *number.re_mut() = 42.0;
+        *number.im_mut() = 69.0;
+        assert_eq!(number, c64(42.0, 69.0));
+    }
 
     #[test]
     fn add() {
