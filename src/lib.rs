@@ -5,20 +5,23 @@
 use std::fmt::Debug;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-/// A complex number.
-pub trait Complex: Add<Output=Self> +
-                   Div<Output=Self> +
-                   Mul<Output=Self> +
-                   Neg<Output=Self> +
-                   Sub<Output=Self> +
-                   Copy + Debug + PartialEq {
+/// A number.
+pub trait Number<T>: Add<Output=T> +
+                     Div<Output=T> +
+                     Mul<Output=T> +
+                     Neg<Output=T> +
+                     Sub<Output=T> +
+                     Copy + Debug + PartialEq {
+}
 
-    type Real: Add<Output=Self::Real> +
-               Div<Output=Self::Real> +
-               Mul<Output=Self::Real> +
-               Neg<Output=Self::Real> +
-               Sub<Output=Self::Real> +
-               Copy + Debug + PartialEq;
+/// A real number.
+pub trait Real: Number<Self> {
+}
+
+/// A complex number.
+pub trait Complex: Number<Self> {
+    /// A real number.
+    type Real: Real;
 
     /// Create a complex number from a real and an imaginary part.
     fn new(Self::Real, Self::Real) -> Self;
@@ -54,6 +57,15 @@ pub struct c64(pub f64, pub f64);
 
 macro_rules! implement(
     ($complex:ident, $real:ty) => (
+        impl Number<$complex> for $complex {
+        }
+
+        impl Number<$real> for $real {
+        }
+
+        impl Real for $real {
+        }
+
         impl Complex for $complex {
             type Real = $real;
 
