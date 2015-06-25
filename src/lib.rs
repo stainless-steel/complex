@@ -3,18 +3,20 @@
 //! [1]: https://en.wikipedia.org/wiki/Complex_number
 
 use std::fmt::Debug;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 /// A complex number.
 pub trait Complex: Add<Output=Self> +
                    Div<Output=Self> +
                    Mul<Output=Self> +
+                   Neg<Output=Self> +
                    Sub<Output=Self> +
                    Copy + Debug + PartialEq {
 
     type Real: Add<Output=Self::Real> +
                Div<Output=Self::Real> +
                Mul<Output=Self::Real> +
+               Neg<Output=Self::Real> +
                Sub<Output=Self::Real> +
                Copy + Debug + PartialEq;
 
@@ -32,6 +34,12 @@ pub trait Complex: Add<Output=Self> +
 
     /// Return the imaginary part as a mutable reference.
     fn im_mut(&mut self) -> &mut Self::Real;
+
+    /// Compute the complex conjugate.
+    #[inline(always)]
+    fn conj(&self) -> Self {
+        Complex::new(self.re(), -self.im())
+    }
 }
 
 /// A complex number with 32-bit parts.
@@ -132,6 +140,15 @@ macro_rules! implement(
             }
         }
 
+        impl Neg for $complex {
+            type Output = Self;
+
+            #[inline(always)]
+            fn neg(self) -> Self {
+                Complex::new(-self.re(), -self.im())
+            }
+        }
+
         impl Sub for $complex {
             type Output = Self;
 
@@ -186,6 +203,11 @@ mod tests {
         assert_eq!(c64(1.0, -5.0) * c64(-9.0, 2.0), c64(1.0, 47.0));
         assert_eq!(c64(4.0, 1.0) * c64(2.0, 3.0), c64(5.0, 14.0));
         assert_eq!(c64(1.0, -8.0) * c64(1.0, 8.0), c64(65.0, 0.0));
+    }
+
+    #[test]
+    fn neg() {
+        assert_eq!(-c64(42.0, 69.0), c64(42.0, 69.0) * (-1.0));
     }
 
     #[test]
