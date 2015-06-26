@@ -99,7 +99,7 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn add(self, rhs: Self) -> Self {
+            fn add(self, rhs: Self) -> Self::Output {
                 Complex::new(self.re() + rhs.re(), self.im() + rhs.im())
             }
         }
@@ -108,8 +108,17 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn add(self, rhs: $real) -> Self {
+            fn add(self, rhs: $real) -> Self::Output {
                 Complex::new(self.re() + rhs, self.im())
+            }
+        }
+
+        impl Add<$complex> for $real {
+            type Output = $complex;
+
+            #[inline(always)]
+            fn add(self, rhs: $complex) -> Self::Output {
+                Complex::new(self + rhs.re(), rhs.im())
             }
         }
 
@@ -117,7 +126,7 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn div(self, rhs: Self) -> Self {
+            fn div(self, rhs: Self) -> Self::Output {
                 let denominator = rhs.re() * rhs.re() + rhs.im() * rhs.im();
                 Complex::new((self.re() * rhs.re() + self.im() * rhs.im()) / denominator,
                              (self.im() * rhs.re() - self.re() * rhs.im()) / denominator)
@@ -128,8 +137,18 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn div(self, rhs: $real) -> Self {
+            fn div(self, rhs: $real) -> Self::Output {
                 Complex::new(self.re() / rhs, self.im() / rhs)
+            }
+        }
+
+        impl Div<$complex> for $real {
+            type Output = $complex;
+
+            #[inline(always)]
+            fn div(self, rhs: $complex) -> Self::Output {
+                let denominator = rhs.re() * rhs.re() + rhs.im() * rhs.im();
+                Complex::new((self * rhs.re()) / denominator, (-self * rhs.im()) / denominator)
             }
         }
 
@@ -137,7 +156,7 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn mul(self, rhs: Self) -> Self {
+            fn mul(self, rhs: Self) -> Self::Output {
                 Complex::new(self.re() * rhs.re() - self.im() * rhs.im(),
                              self.im() * rhs.re() + self.re() * rhs.im())
             }
@@ -147,8 +166,17 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn mul(self, rhs: $real) -> Self {
+            fn mul(self, rhs: $real) -> Self::Output {
                 Complex::new(self.re() * rhs, self.im() * rhs)
+            }
+        }
+
+        impl Mul<$complex> for $real {
+            type Output = $complex;
+
+            #[inline(always)]
+            fn mul(self, rhs: $complex) -> Self::Output {
+                Complex::new(self * rhs.re(), self * rhs.im())
             }
         }
 
@@ -156,7 +184,7 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn neg(self) -> Self {
+            fn neg(self) -> Self::Output {
                 Complex::new(-self.re(), -self.im())
             }
         }
@@ -165,7 +193,7 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn sub(self, rhs: Self) -> Self {
+            fn sub(self, rhs: Self) -> Self::Output {
                 Complex::new(self.re() - rhs.re(), self.im() - rhs.im())
             }
         }
@@ -174,8 +202,17 @@ macro_rules! implement(
             type Output = Self;
 
             #[inline(always)]
-            fn sub(self, rhs: $real) -> Self {
+            fn sub(self, rhs: $real) -> Self::Output {
                 Complex::new(self.re() - rhs, self.im())
+            }
+        }
+
+        impl Sub<$complex> for $real {
+            type Output = $complex;
+
+            #[inline(always)]
+            fn sub(self, rhs: $complex) -> Self::Output {
+                Complex::new(self - rhs.re(), -rhs.im())
             }
         }
     );
@@ -199,22 +236,22 @@ mod tests {
     #[test]
     fn add() {
         assert_eq!(c64(-4.0, 7.0) + c64(5.0, -10.0), c64(1.0, -3.0));
+        assert_eq!(c64(-4.0, 7.0) + 5.0, c64(1.0, 7.0));
+        assert_eq!(5.0 + c64(-4.0, 7.0), c64(1.0, 7.0));
     }
 
     #[test]
     fn div() {
         assert_eq!(c64(3.0, -1.0) / c64(2.0, 7.0), c64(-1.0 / 53.0, -23.0 / 53.0));
-        assert_eq!(c64(3.0, 0.0) / c64(9.0, -1.0), c64(27.0 / 82.0, 3.0 / 82.0));
-        assert_eq!(c64(0.0, 8.0) / c64(1.0, 2.0), c64(16.0 / 5.0, 8.0 / 5.0));
-        assert_eq!(c64(6.0, -9.0) / c64(0.0, 2.0), c64(-9.0 / 2.0, -3.0));
+        assert_eq!(c64(3.0, -1.0) / 2.0, c64(1.5, -0.5));
+        assert_eq!(2.0 / c64(3.0, -1.0), c64(0.6, 0.2));
     }
 
     #[test]
     fn mul() {
-        assert_eq!(c64(0.0, 7.0) * c64(-5.0, 2.0), c64(-14.0, -35.0));
-        assert_eq!(c64(1.0, -5.0) * c64(-9.0, 2.0), c64(1.0, 47.0));
         assert_eq!(c64(4.0, 1.0) * c64(2.0, 3.0), c64(5.0, 14.0));
-        assert_eq!(c64(1.0, -8.0) * c64(1.0, 8.0), c64(65.0, 0.0));
+        assert_eq!(c64(4.0, 1.0) * 2.0, c64(8.0, 2.0));
+        assert_eq!(2.0 * c64(4.0, 1.0), c64(8.0, 2.0));
     }
 
     #[test]
@@ -225,7 +262,8 @@ mod tests {
     #[test]
     fn sub() {
         assert_eq!(c64(4.0, 12.0) - c64(3.0, -15.0), c64(1.0, 27.0));
-        assert_eq!(c64(0.0, 5.0) - c64(-9.0, 1.0), c64(9.0, 4.0));
+        assert_eq!(c64(4.0, 12.0) - 3.0, c64(1.0, 12.0));
+        assert_eq!(3.0 - c64(4.0, 12.0), c64(-1.0, -12.0));
     }
 
     #[test]
