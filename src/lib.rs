@@ -27,7 +27,7 @@ pub trait Complex: Number {
     fn new(Self::Real, Self::Real) -> Self;
 
     /// Create a complex number from a modulus and an argument.
-    fn new_polar(Self::Real, Self::Real) -> Self;
+    fn from_polar(Self::Real, Self::Real) -> Self;
 
     /// Return the real part.
     fn re(&self) -> Self::Real;
@@ -84,7 +84,7 @@ macro_rules! implement(
             }
 
             #[inline(always)]
-            fn new_polar(abs: Self::Real, arg: Self::Real) -> Self {
+            fn from_polar(abs: Self::Real, arg: Self::Real) -> Self {
                 $complex(abs * arg.cos(), abs * arg.sin())
             }
 
