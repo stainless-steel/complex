@@ -6,20 +6,20 @@ use std::fmt::Debug;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 /// A number.
-pub trait Number<T>: Add<Output=T> +
-                     Div<Output=T> +
-                     Mul<Output=T> +
-                     Neg<Output=T> +
-                     Sub<Output=T> +
-                     Copy + Debug + PartialEq {
+pub trait Number: Add<Output=Self> +
+                  Div<Output=Self> +
+                  Mul<Output=Self> +
+                  Neg<Output=Self> +
+                  Sub<Output=Self> +
+                  Copy + Debug + PartialEq {
 }
 
 /// A real number.
-pub trait Real: Number<Self> {
+pub trait Real: Number {
 }
 
 /// A complex number.
-pub trait Complex: Number<Self> {
+pub trait Complex: Number {
     /// A real number.
     type Real: Real;
 
@@ -57,10 +57,10 @@ pub struct c64(pub f64, pub f64);
 
 macro_rules! implement(
     ($complex:ident, $real:ty) => (
-        impl Number<$complex> for $complex {
+        impl Number for $complex {
         }
 
-        impl Number<$real> for $real {
+        impl Number for $real {
         }
 
         impl Real for $real {
