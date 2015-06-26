@@ -226,11 +226,22 @@ mod tests {
     use {Complex, c64};
 
     #[test]
-    fn re_im_mut() {
-        let mut number = c64(0.0, 0.0);
+    fn re_mut() {
+        let mut number = c64(69.0, 0.0);
         *number.re_mut() = 42.0;
-        *number.im_mut() = 69.0;
-        assert_eq!(number, c64(42.0, 69.0));
+        assert_eq!(number, c64(42.0, 0.0));
+    }
+
+    #[test]
+    fn im_mut() {
+        let mut number = c64(0.0, 69.0);
+        *number.im_mut() = 42.0;
+        assert_eq!(number, c64(0.0, 42.0));
+    }
+
+    #[test]
+    fn conj() {
+        assert_eq!(c64(42.0, 69.0).conj(), c64(42.0, -69.0));
     }
 
     #[test]
@@ -271,23 +282,5 @@ mod tests {
         use std::mem::size_of;
         assert_eq!(size_of::<c64>(), 2 * size_of::<f64>());
         assert_eq!(size_of::<[c64; 42]>(), size_of::<[f64; 2 * 42]>());
-    }
-
-    #[test]
-    fn scalar_arguments() {
-        assert_eq!(go(c64(0.0, 0.0), c64(0.0, 0.0), c64(1.0, 1.0)), c64(0.0, 0.0));
-
-        fn go<C>(a: C, b: C, c: C) -> C where C: Complex {
-            (a + b) * (a - b) / c
-        }
-    }
-
-    #[test]
-    fn vector_arguments() {
-        assert_eq!(go(&[c64(0.0, 0.0)], &[c64(0.0, 0.0)], &[c64(1.0, 1.0)]), &[c64(0.0, 0.0)]);
-
-        fn go<C>(a: &[C], b: &[C], c: &[C]) -> Vec<C> where C: Complex {
-            a.iter().zip(b).zip(c).map(|((&a, &b), &c)| (a + b) * (a - b) / c).collect()
-        }
     }
 }
