@@ -38,6 +38,12 @@ pub trait Complex: Number {
     /// Return the imaginary part as a mutable reference.
     fn im_mut(&mut self) -> &mut Self::Real;
 
+    /// Compute the absolute value.
+    fn abs(&self) -> Self::Real;
+
+    /// Compute the argument.
+    fn arg(&self) -> Self::Real;
+
     /// Compute the complex conjugate.
     #[inline(always)]
     fn conj(&self) -> Self {
@@ -92,6 +98,16 @@ macro_rules! implement(
             #[inline(always)]
             fn im_mut(&mut self) -> &mut Self::Real {
                 &mut self.1
+            }
+
+            #[inline(always)]
+            fn abs(&self) -> Self::Real {
+                self.re().hypot(self.im())
+            }
+
+            #[inline(always)]
+            fn arg(&self) -> Self::Real {
+                self.im().atan2(self.re())
             }
         }
 
@@ -237,6 +253,21 @@ mod tests {
         let mut number = c64(0.0, 69.0);
         *number.im_mut() = 42.0;
         assert_eq!(number, c64(0.0, 42.0));
+    }
+
+    #[test]
+    fn abs() {
+        assert_eq!(c64(4.0, 3.0).abs(), 5.0);
+    }
+
+    #[test]
+    fn arg() {
+        use std::f64::consts::PI;
+        assert_eq!(c64(1.0, 0.0).arg(), 0.0);
+        assert_eq!(c64(1.0, 1.0).arg(), PI / 4.0);
+        assert_eq!(c64(0.0, 1.0).arg(), PI / 2.0);
+        assert_eq!(c64(-1.0, 0.0).arg(), PI);
+        assert_eq!(c64(0.0, -1.0).arg(), -PI / 2.0);
     }
 
     #[test]
