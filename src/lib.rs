@@ -41,11 +41,17 @@ pub trait Complex: Number {
     /// Return the imaginary part as a mutable reference.
     fn im_mut(&mut self) -> &mut Self::Real;
 
-    /// Compute the absolute value.
+    /// Compute the modulus.
     fn abs(&self) -> Self::Real;
 
     /// Compute the argument.
     fn arg(&self) -> Self::Real;
+
+    /// Compute the modulus and the argument.
+    #[inline(always)]
+    fn to_polar(&self) -> (Self::Real, Self::Real) {
+        (self.abs(), self.arg())
+    }
 
     /// Compute the complex conjugate.
     #[inline(always)]
