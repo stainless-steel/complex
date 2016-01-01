@@ -1,9 +1,8 @@
 [package]
 name = "complex"
-version = "0.7.5"
+version = "0.8.0"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 license = "MIT"
-repository = "https://github.com/stainless-steel/complex"
-homepage = "https://github.com/stainless-steel/complex"
-documentation = "https://stainless-steel.github.io/complex"
-description = "The package provides complex numbers."
+repository = "https://github.com/hilbert-space/complex"
+homepage = "https://github.com/hilbert-space/complex"
+description = "The package is deprecated in favor of num."
